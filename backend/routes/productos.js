@@ -23,8 +23,13 @@ router.get('/:id/stock', async (req, res) => {
 });
 // Obtener todos los productos
 router.get('/', async (req, res) => {
+    // Paso 1: Captura los parámetros de la consulta
+    const limit = req.query.limit ? parseInt(req.query.limit) : 15; // Valor predeterminado es 15
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0; // Valor predeterminado es 0
+
     try {
-        const [rows] = await db.query('SELECT * FROM Productos');
+        // Paso 3: Usa los valores limit y offset en tu consulta SQL
+        const [rows] = await db.query('SELECT * FROM Productos LIMIT ? OFFSET ?', [limit, offset]);
         res.json(rows);
     } catch (error) {
         console.error(error);
@@ -59,7 +64,6 @@ router.get('/:id', async (req, res) => {
         res.status(500).send('Error al obtener el producto');
     }
 });
-
 // Función para mover archivos de forma promisificada
 const moveFile = (file, dest) => new Promise((resolve, reject) => {
     file.mv(dest, (err) => {
@@ -85,10 +89,9 @@ router.post('/', async (req, res) => {
             return res.status(400).send('Formato de archivo no permitido.');
         }
 
-        // Generando un nombre de archivo único
-        const uniqueName = Date.now() + '-' + uploadedFile.name;
-        const absolutePath = path.join(__dirname, '../../public/assets/imgProductos', uniqueName);
-        const relativePath = '/assets/imgProductos/' + uniqueName;
+        const filename = uploadedFile.name;
+        const absolutePath = path.join(__dirname, '../../public/assets/imgProductos', filename);
+        const relativePath = '/assets/imgProductos/' + filename;
 
         // Asegúrate de que la carpeta exista
         const dirPath = path.dirname(absolutePath);
@@ -112,7 +115,6 @@ router.post('/', async (req, res) => {
         res.status(500).send('Error al agregar el producto');
     }
 });
-
 
 
 // Actualizar un producto
