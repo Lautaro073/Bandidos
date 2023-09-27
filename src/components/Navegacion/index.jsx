@@ -123,7 +123,7 @@ function NavbarPrincipal() {
                 onChange={(e) => setSearch(e.target.value)}
               />
               <button className="btn" type="submit">
-                <i className="bx bx-search"></i>
+                <i className="bx bx-search text-black"></i>
               </button>
             </form>
           </div>

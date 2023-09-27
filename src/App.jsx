@@ -12,11 +12,13 @@ import CargarProductos from "./pages/cargarProductos";
 import SearchPage from "./components/Navegacion/SearchPage";
 import ProductosPorCategoria from "./components/Navegacion/ProductosPorCategoria";
 //import ProductosPorCategoria from './components/ProductoPorCategoria';
+import Footer from "./components/Footer/inicio"
 import { BrowserRouter  as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 import PrivateRoute from './PrivateRoute'; // Asegúrate de poner la ruta correcta al componente.
 import './css/alerta.css'
+import 'font-awesome/css/font-awesome.min.css';
 
 function App() {
   function showAlert(message, type) {
@@ -137,6 +139,7 @@ function App() {
   return (
     <Router>
     <Navegacion />
+    
     <Routes>
       <Route path="/" element={<Inicio agregarAlCarrito={agregarAlCarrito} />} />
       
@@ -165,6 +168,7 @@ function App() {
         </Route>
         <Route path="*" element={<Inicio agregarAlCarrito={agregarAlCarrito} />} /> {/* Esto captura cualquier ruta no definida */}
       </Routes>
+      <Footer/>
     </Router>
   );
 }

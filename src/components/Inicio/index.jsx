@@ -4,23 +4,50 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 function Inicio(props) {
+  const generarLinkWhatsApp = (nombreProducto) => {
+    const numero = "+5491126009633";
+    const base = "https://api.whatsapp.com/send?phone=";
+    const mensaje = `Hola! Me gustaría saber mas sobre este producto: ${nombreProducto}`;
+    return `${base}${numero}&text=${encodeURIComponent(mensaje)}`;
+  };
+
   const { id } = useParams();
   const [productos, setProductos] = useState([]);
   const [categoriaNombre, setCategoriaNombre] = useState("Todos los productos");
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const { agregarAlCarrito } = props;
+
+  const limit = window.innerWidth <= 768 ? 10 : 15;
+
+  // Este useEffect se activará cuando el ID de categoría cambie
+  useEffect(() => {
+    setOffset(0); // Restablecer offset
+    setHasMore(true); // Asumir que hay más productos hasta que se demuestre lo contrario
+    setProductos([]); // Limpiar productos anteriores
+  }, [id]);
 
   useEffect(() => {
     async function obtenerProductos() {
-      let url = "productos";
+      let url = `productos?limit=${limit}&offset=${offset}`;
+
       if (id) {
-        url += `?categoria=${id}`; // Suponiendo que tu API filtra productos por categoría con el parámetro "categoria".
+        url += `&categoria=${id}`;
       }
 
       try {
         const response = await axios.get(url);
-        setProductos(response.data);
 
-        // Establecer el nombre de la categoría, suponiendo que cada producto tiene un campo "nombre_categoria".
+        if (response.data.length < limit) {
+          setHasMore(false);
+        } else {
+          setHasMore(true); // Asegurarse de que el botón de "Mostrar más" permanezca activo si hay más productos
+        }
+
+        // Concatenar los nuevos productos al final del array existente
+        setProductos((prevProductos) => [...prevProductos, ...response.data]);
+
+        // Establecer el nombre de la categoría
         if (response.data[0]) {
           setCategoriaNombre(response.data[0].nombre_categoria);
         } else {
@@ -32,13 +59,13 @@ function Inicio(props) {
     }
 
     obtenerProductos();
-  }, [id]);
+  }, [id, offset]);
 
   return (
     <>
       <Carrusel />
       <div className="container mt-5">
-        <h2 className="mb-4 text-white">{categoriaNombre} disponibles:</h2>
+        <h2 className="mb-4 text-white text-center">{categoriaNombre} Disponibles:</h2>
         <div className="row">
           {productos.map((producto) => (
             <div key={producto.id_producto} className="col-md-4 mb-4">
@@ -48,20 +75,41 @@ function Inicio(props) {
                 </div>
                 <div className="card-body">
                   <h5 className="card-title">
-                    {producto.nombre} - ${producto.precio}
+                    {producto.nombre} - {producto.precio}$
                   </h5>
                   <p className="card-text">{producto.descripcion}</p>
-                  <button
-                    className="btnn btn-primary"
-                    onClick={() => agregarAlCarrito(producto.id_producto, 1)}
-                  >
-                    Agregar al Carrito
-                  </button>
+                  <div className="card-actions">
+                    <button
+                      className="btnn btn-primary"
+                      onClick={() => agregarAlCarrito(producto.id_producto, 1)}
+                    >
+                      Agregar al Carrito
+                    </button>
+                    <a
+                      href={generarLinkWhatsApp(producto.nombre)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-success ml-2"
+                    >
+                      <i className="fa fa-whatsapp"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
+
+        {hasMore && (
+          <div className="text-center mt-4">
+            <button
+              className="btn btnnn-primary"
+              onClick={() => setOffset((prevOffset) => prevOffset + limit)}
+            >
+              Mostrar más
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

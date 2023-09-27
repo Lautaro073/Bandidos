@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "../../config";
 function Carrito() {
   function showAlert(message, type) {
-    const alertDiv = document.createElement('div');
+    const alertDiv = document.createElement("div");
     alertDiv.className = `alert-custom alert-${type}`;
     alertDiv.textContent = message;
 
@@ -13,18 +13,18 @@ function Carrito() {
 
     // Dar un pequeño tiempo para que la alerta inicialice y luego agregar la clase 'show'
     setTimeout(() => {
-        alertDiv.classList.add('show');
+      alertDiv.classList.add("show");
     }, 10);
 
     // Después de 3 segundos, remover la alerta
     setTimeout(() => {
-        alertDiv.classList.remove('show');
-        // Esperamos que termine la transición de salida y luego eliminamos el elemento del DOM
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 310); // 10 ms adicionales para asegurarnos de que la transición ha terminado
+      alertDiv.classList.remove("show");
+      // Esperamos que termine la transición de salida y luego eliminamos el elemento del DOM
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 310); // 10 ms adicionales para asegurarnos de que la transición ha terminado
     }, 3000);
-}
+  }
   const [productos, setProductos] = useState([]);
   const navigate = useNavigate();
   const sessionId = localStorage.getItem("sessionId");
@@ -41,7 +41,6 @@ function Carrito() {
     cargarProductos();
   }, [cargarProductos]);
 
-
   const agregarProducto = async (productoId) => {
     console.log("Producto ID:", productoId); // Agrega esta línea
     try {
@@ -55,7 +54,8 @@ function Carrito() {
         // Verifica si agregar más productos excederá el stock disponible
         if (producto.cantidad + 1 > stockActual) {
           showAlert(
-            "No hay suficiente stock disponible para agregar más productos." ,"error"
+            "No hay suficiente stock disponible para agregar más productos.",
+            "error"
           );
           return;
         }
@@ -63,7 +63,8 @@ function Carrito() {
         // Si no hay productos del mismo tipo en el carrito, verifica si la cantidad a agregar supera el stock disponible
         if (1 > stockActual) {
           showAlert(
-            "No hay suficiente stock disponible para agregar más productos." ,"error"
+            "No hay suficiente stock disponible para agregar más productos.",
+            "error"
           );
           return;
         }
@@ -127,7 +128,6 @@ function Carrito() {
     );
   };
 
-  
   useEffect(() => {
     // Verifica si el parámetro "status" está presente en la URL
     const queryParams = new URLSearchParams(window.location.search);
@@ -153,20 +153,28 @@ function Carrito() {
       .join(", ")}. Total a pagar: ${calcularTotal()} $`;
     return `${base}${numero}&text=${encodeURIComponent(mensaje)}`;
   };
-
   return (
-    <div className="container mt-4">
-      <h2>Productos en el Carrito</h2>
-      {productos.length === 0 ? (
-        <div className="alert alert-warning" role="alert">
-          No hay productos en el carrito.
-        </div>
-      ) : (
-        <div className="list-group">
-          {productos.map((producto, index) => {
-            return (
-              <div className="list-group-item" key={index} style={{backgroundColor: "black", color: "white"}}>
-                <div className="d-flex justify-content-between align-items-center">
+    <div className="main-container">
+      <div className="container mt-4">
+        <h2 style={{ color: "white" }}>Productos en el Carrito</h2>
+
+        {productos.length === 0 ? (
+          <div className="alert alert-dark" role="alert">
+            No hay productos en el carrito.
+          </div>
+        ) : (
+          <div>
+            {productos.map((producto, index) => {
+              return (
+                <div
+                  key={index}
+                  className="d-flex justify-content-between align-items-center py-2"
+                  style={{
+                    borderBottom: "1px solid #ff4500",
+                    backgroundColor: "black",
+                    color: "white",
+                  }}
+                >
                   <img
                     src={producto.imagen}
                     alt={producto.nombre}
@@ -177,7 +185,7 @@ function Carrito() {
                   <h5 className="mb-1">{producto.nombre}</h5>
                   <div>
                     <button
-                      className="btn btn-sm btn-danger mr-2"
+                      className="btn btn-sm btn-outline-danger mr-2"
                       onClick={() => quitarProducto(producto.id_producto)}
                     >
                       -
@@ -186,33 +194,38 @@ function Carrito() {
                       {producto.cantidad}
                     </span>
                     <button
-                      className="btn btn-sm btn-success ml-2"
+                      className="btn btn-sm btn-outline-success ml-2"
                       onClick={() => agregarProducto(producto.id_producto)}
                     >
                       +
                     </button>
-  
+
                     <div className="badge bg-primary rounded-pill ml-3">
-                      ${producto.precio * producto.cantidad}  {/* Total del producto individual */}
+                      ${producto.precio * producto.cantidad}
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-  
-      {productos.length > 0 && (
-        <div className="mt-3">
-          <a className="btn btn-success" href={generarLinkWhatsApp()} target="_blank" rel="noopener noreferrer">
-            Confirmar y Chatear en WhatsApp - Total del carrito: ${calcularTotal()}
-          </a>
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+
+        {productos.length > 0 && (
+          <div className="mt-3 text-center">
+            <a
+              className="btn btn-lg btn-confirm"
+              href={generarLinkWhatsApp()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fa fa-whatsapp"></i> Confirmar pedido
+            </a>
+            <div className="mt-2">Total del carrito: ${calcularTotal()}</div>
+          </div>
+        )}
+      </div>
     </div>
   );
-  
 }
 
 export default Carrito;

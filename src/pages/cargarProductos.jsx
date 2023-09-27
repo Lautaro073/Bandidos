@@ -98,11 +98,7 @@ function CargarProducto() {
       // Puedes limpiar el formulario o redirigir al usuario después de eliminar el producto
       setProductoId(null);
       setNombreProducto("");
-      setDescripcion("");
-      setPrecio("");
-      setImagen(null);
-      setCategorias(null)
-      setStock("0")
+      setDescripcion("")
       // ... limpiar otros campos
     } catch (error) {
       console.error("Hubo un error al eliminar el producto:", error);
@@ -193,7 +189,7 @@ function CargarProducto() {
           >
             {categorias.map((categoria) => (
               <option
-              className="bg-dark"
+              className=""
                 key={categoria.id_categoria}
                 value={categoria.id_categoria}
               >
